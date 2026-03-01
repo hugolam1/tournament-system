@@ -4,551 +4,259 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>比賽晉級系統</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Microsoft JhengHei', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            padding: 40px;
-        }
-
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .controls {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .input-group {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        input[type="number"] {
-            padding: 12px 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            width: 100px;
-            transition: border-color 0.3s;
-        }
-
-        input[type="number"]:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        button {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            color: white;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-        }
-
-        .btn-success:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(56, 239, 125, 0.4);
-        }
-
-        .btn-warning {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        }
-
-        .btn-warning:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
-        }
-
-        .btn-export {
-            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-        }
-
-        .btn-export:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(250, 112, 154, 0.4);
-        }
-
-        .export-group {
-            display: flex;
-            gap: 10px;
-            border-left: 3px solid #ddd;
-            padding-left: 15px;
-        }
-
-        #bracketContainer {
-            overflow-x: auto;
-            padding: 20px 0;
-        }
-
-        #bracket {
-            display: flex;
-            gap: 60px;
-            min-width: min-content;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 15px;
-        }
-
-        .round {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            min-width: 200px;
-        }
-
-        .round-title {
-            text-align: center;
-            font-weight: bold;
-            color: #667eea;
-            margin-bottom: 20px;
-            font-size: 1.2em;
-            padding: 10px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .match {
-            background: white;
-            border-radius: 12px;
-            padding: 15px;
-            margin: 15px 0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            transition: all 0.3s;
-            border: 2px solid transparent;
-        }
-
-        .match:hover {
-            transform: translateX(5px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.2);
-            border-color: #667eea;
-        }
-
-        .player {
-            display: flex;
-            align-items: center;
-            padding: 12px;
-            margin: 8px 0;
-            border-radius: 8px;
-            background: #f8f9fa;
-            transition: all 0.3s;
-            cursor: pointer;
-            border: 2px solid transparent;
-        }
-
-        .player:hover {
-            background: #e9ecef;
-            border-color: #667eea;
-        }
-
-        .player.winner {
-            background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
-            border-color: #667eea;
-            font-weight: bold;
-        }
-
-        .player-name {
-            flex: 1;
-            font-size: 16px;
-        }
-
-        .player input[type="checkbox"] {
-            margin-right: 12px;
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-            accent-color: #667eea;
-        }
-
-        .vs {
-            text-align: center;
-            color: #999;
-            font-size: 14px;
-            margin: 5px 0;
-            font-weight: bold;
-        }
-
-        .empty-slot {
-            color: #999;
-            font-style: italic;
-            padding: 12px;
-            text-align: center;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-
-            h1 {
-                font-size: 1.8em;
-            }
-
-            .controls {
-                flex-direction: column;
-            }
-
-            .input-group {
-                width: 100%;
-                justify-content: center;
-            }
-
-            #bracket {
-                gap: 30px;
-            }
-
-            .round {
-                min-width: 180px;
-            }
-        }
-
-        .champion {
-            text-align: center;
-            padding: 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 15px;
-            margin-top: 20px;
-            font-size: 1.5em;
-            font-weight: bold;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.02);
-            }
-        }
-
-        .trophy {
-            font-size: 3em;
-            margin-bottom: 10px;
-        }
+        body { margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🏆 比賽晉級系統</h1>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useMemo, useRef } = React;
         
-        <div class="controls">
-            <div class="input-group">
-                <label for="playerCount">參賽人數：</label>
-                <input type="number" id="playerCount" min="2" max="64" value="8">
-            </div>
-            <button class="btn-primary" onclick="generateBracket()">生成對戰表</button>
-            <button class="btn-success" onclick="advanceWinners()">晉級選中選手</button>
-            <button class="btn-warning" onclick="resetBracket()">重置</button>
-            
-            <div class="export-group">
-                <button class="btn-export" onclick="exportToCSV()">📥 匯出 CSV</button>
-                <button class="btn-export" onclick="exportToPNG()">📸 匯出 PNG</button>
-            </div>
-        </div>
+        // Lucide React Icons (簡化版內嵌)
+        const Icon = ({ d, ...props }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+                <path d={d} />
+            </svg>
+        );
+        
+        const RefreshCw = (props) => <Icon d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8M3 12l2.26 2.26A9.75 9.75 0 0 0 12 21a9 9 0 0 0 9-9M21 16V8m0 0h-8" {...props} />;
+        const Undo = (props) => <Icon d="M3 7v6h6M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13" {...props} />;
+        const Download = (props) => <Icon d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" {...props} />;
+        const FileSpreadsheet = (props) => <Icon d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6 M8 13h8 M8 17h8" {...props} />;
+        const Trophy = (props) => <Icon d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6 M18 9h1.5a2.5 2.5 0 0 0 0-5H18 M4 22h16 M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22 M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22 M18 2H6v7a6 6 0 0 0 12 0V2z" {...props} />;
+        const Users = (props) => <Icon d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M22 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75" {...props} />;
+        const Edit2 = (props) => <Icon d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z M15 5l4 4" {...props} />;
+        const Check = (props) => <Icon d="M20 6 9 17l-5-5" {...props} />;
+        const X = (props) => <Icon d="M18 6 6 18 M6 6l12 12" {...props} />;
+        const Image = (props) => <Icon d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z M14 2v6h6 M12 18v-6 M9 15l3 3 3-3" {...props} />;
 
-        <div id="bracketContainer">
-            <div id="bracket"></div>
-        </div>
-    </div>
+        function TournamentBracket() {
+          const [numParticipants, setNumParticipants] = useState(8);
+          const [studentIds, setStudentIds] = useState([]);
+          const [participants, setParticipants] = useState([]);
+          const [matches, setMatches] = useState([]);
+          const [history, setHistory] = useState([]);
+          const [isGenerated, setIsGenerated] = useState(false);
+          const [isEditingIds, setIsEditingIds] = useState(false);
+          const [tempIds, setTempIds] = useState('');
+          const [isExporting, setIsExporting] = useState(false);
+          const bracketRef = useRef(null);
 
-    <script>
-        let players = [];
-        let currentRound = 0;
-        let rounds = [];
-        let matchHistory = []; // 記錄所有比賽結果
+          const generateDefaultIds = (num) => {
+            return Array.from({ length: num }, (_, i) => (i + 1).toString());
+          };
 
-        function generateBracket() {
-            const count = parseInt(document.getElementById('playerCount').value);
-            
-            if (count < 2 || count > 64) {
-                alert('請輸入 2-64 之間的參賽人數');
-                return;
-            }
+          const calculateRounds = (num) => {
+            return Math.ceil(Math.log2(num));
+          };
 
-            // 找到大於等於參賽人數的最小 2 的次方
-            const bracketSize = Math.pow(2, Math.ceil(Math.log2(count)));
-            
-            // 初始化選手
-            players = [];
-            for (let i = 1; i <= count; i++) {
-                players.push({
-                    id: i,
-                    name: `選手 ${i}`,
-                    active: true
-                });
-            }
-
-            // 補充 bye（輪空）
-            while (players.length < bracketSize) {
-                players.push({
-                    id: null,
-                    name: 'BYE',
-                    active: false
-                });
-            }
-
-            // 重置狀態
-            currentRound = 0;
-            rounds = [];
-            matchHistory = [];
-            
-            // 創建第一輪對戰
-            const firstRound = [];
-            for (let i = 0; i < players.length; i += 2) {
-                firstRound.push({
-                    player1: players[i],
-                    player2: players[i + 1],
-                    winner: null
-                });
-            }
-            rounds.push(firstRound);
-
-            renderBracket();
-        }
-
-        function renderBracket() {
-            const bracket = document.getElementById('bracket');
-            bracket.innerHTML = '';
-
-            rounds.forEach((round, roundIndex) => {
-                const roundDiv = document.createElement('div');
-                roundDiv.className = 'round';
-
-                const roundTitle = document.createElement('div');
-                roundTitle.className = 'round-title';
-                
-                if (rounds.length === 1) {
-                    roundTitle.textContent = '決賽';
-                } else if (roundIndex === rounds.length - 1) {
-                    roundTitle.textContent = '決賽';
-                } else if (roundIndex === rounds.length - 2) {
-                    roundTitle.textContent = '準決賽';
-                } else {
-                    roundTitle.textContent = `第 ${roundIndex + 1} 輪`;
-                }
-
-                roundDiv.appendChild(roundTitle);
-
-                round.forEach((match, matchIndex) => {
-                    const matchDiv = document.createElement('div');
-                    matchDiv.className = 'match';
-
-                    // Player 1
-                    const player1Div = createPlayerDiv(match.player1, roundIndex, matchIndex, 1);
-                    matchDiv.appendChild(player1Div);
-
-                    // VS
-                    const vsDiv = document.createElement('div');
-                    vsDiv.className = 'vs';
-                    vsDiv.textContent = 'VS';
-                    matchDiv.appendChild(vsDiv);
-
-                    // Player 2
-                    const player2Div = createPlayerDiv(match.player2, roundIndex, matchIndex, 2);
-                    matchDiv.appendChild(player2Div);
-
-                    roundDiv.appendChild(matchDiv);
-                });
-
-                bracket.appendChild(roundDiv);
-            });
-
-            // 顯示冠軍
-            if (rounds.length > 0 && rounds[rounds.length - 1][0].winner) {
-                const champion = rounds[rounds.length - 1][0].winner;
-                const championDiv = document.createElement('div');
-                championDiv.className = 'champion';
-                championDiv.innerHTML = `
-                    <div class="trophy">🏆</div>
-                    <div>冠軍：${champion.name}</div>
-                `;
-                bracket.appendChild(championDiv);
-            }
-        }
-
-        function createPlayerDiv(player, roundIndex, matchIndex, playerNum) {
-            const div = document.createElement('div');
-            
-            if (!player || !player.active) {
-                div.className = 'empty-slot';
-                div.textContent = player && player.name === 'BYE' ? '(輪空)' : '等待晉級';
-                return div;
-            }
-
-            div.className = 'player';
-            
-            const match = rounds[roundIndex][matchIndex];
-            if (match.winner && match.winner.id === player.id) {
-                div.classList.add('winner');
-            }
-
-            // 只有當前輪次可以選擇
-            if (roundIndex === currentRound && !match.winner) {
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.onchange = (e) => selectWinner(roundIndex, matchIndex, playerNum, e.target.checked);
-                div.appendChild(checkbox);
-            }
-
-            const nameSpan = document.createElement('span');
-            nameSpan.className = 'player-name';
-            nameSpan.textContent = player.name;
-            div.appendChild(nameSpan);
-
-            return div;
-        }
-
-        function selectWinner(roundIndex, matchIndex, playerNum, checked) {
-            const match = rounds[roundIndex][matchIndex];
-            
-            if (checked) {
-                // 取消同場比賽中另一位選手的選擇
-                const otherPlayerNum = playerNum === 1 ? 2 : 1;
-                match.winner = playerNum === 1 ? match.player1 : match.player2;
+          const startEditingIds = () => {
+            setIsEditingIds(true);
+            if (studentIds.length > 0) {
+              setTempIds(studentIds.join('\n'));
             } else {
-                match.winner = null;
+              setTempIds(generateDefaultIds(numParticipants).join('\n'));
             }
+          };
 
-            renderBracket();
-        }
-
-        function advanceWinners() {
-            const currentMatches = rounds[currentRound];
+          const confirmEditIds = () => {
+            const ids = tempIds.split('\n').map(id => id.trim()).filter(id => id !== '');
+            if (ids.length !== numParticipants) {
+              alert(`請輸入 ${numParticipants} 個學號（目前有 ${ids.length} 個）`);
+              return;
+            }
             
-            // 檢查是否所有比賽都有勝者
-            const allMatchesDecided = currentMatches.every(match => {
-                // BYE 自動獲勝
-                if (!match.player1.active) return match.player2.active;
-                if (!match.player2.active) return match.player1.active;
-                return match.winner !== null;
-            });
-
-            if (!allMatchesDecided) {
-                alert('請先選擇所有比賽的勝者！');
-                return;
+            const uniqueIds = new Set(ids);
+            if (uniqueIds.size !== ids.length) {
+              alert('學號不能重複！');
+              return;
             }
+            
+            setStudentIds(ids);
+            setIsEditingIds(false);
+          };
 
-            // 自動處理 BYE
-            currentMatches.forEach(match => {
-                if (!match.winner) {
-                    if (!match.player1.active && match.player2.active) {
-                        match.winner = match.player2;
-                    } else if (match.player1.active && !match.player2.active) {
-                        match.winner = match.player1;
-                    }
-                }
+          const cancelEditIds = () => {
+            setIsEditingIds(false);
+            setTempIds('');
+          };
+
+          const generateBracket = () => {
+            const ids = studentIds.length === numParticipants 
+              ? studentIds 
+              : generateDefaultIds(numParticipants);
+            
+            const rounds = calculateRounds(numParticipants);
+            const totalSlots = Math.pow(2, rounds);
+            
+            const shuffled = [...ids].sort(() => Math.random() - 0.5);
+            const filled = [...shuffled, ...Array(totalSlots - numParticipants).fill(null)];
+            
+            const firstRoundMatches = [];
+            for (let i = 0; i < filled.length; i += 2) {
+              const player1 = filled[i];
+              const player2 = filled[i + 1];
+              
+              let winner = null;
+              if (player1 && !player2) {
+                winner = player1;
+              } else if (player2 && !player1) {
+                winner = player2;
+              }
+              
+              firstRoundMatches.push({
+                round: 0,
+                matchId: i / 2,
+                player1: player1,
+                player2: player2,
+                winner: winner
+              });
+            }
+            
+            const allMatches = [...firstRoundMatches];
+            let matchIdCounter = firstRoundMatches.length;
+            
+            for (let r = 1; r < rounds; r++) {
+              const prevRoundMatches = allMatches.filter(m => m.round === r - 1);
+              const roundMatches = [];
+              
+              for (let i = 0; i < prevRoundMatches.length; i += 2) {
+                const prevMatch1 = prevRoundMatches[i];
+                const prevMatch2 = prevRoundMatches[i + 1];
                 
-                // 記錄比賽結果
-                if (match.player1.active && match.player2.active) {
-                    matchHistory.push({
-                        round: currentRound + 1,
-                        player1: match.player1.name,
-                        player2: match.player2.name,
-                        winner: match.winner.name
-                    });
-                }
-            });
-
-            // 檢查是否是最後一輪
-            if (currentMatches.length === 1) {
-                alert(`恭喜 ${currentMatches[0].winner.name} 獲得冠軍！🏆`);
-                renderBracket();
-                return;
-            }
-
-            // 創建下一輪
-            const nextRound = [];
-            for (let i = 0; i < currentMatches.length; i += 2) {
-                nextRound.push({
-                    player1: currentMatches[i].winner,
-                    player2: currentMatches[i + 1].winner,
-                    winner: null
+                roundMatches.push({
+                  round: r,
+                  matchId: matchIdCounter++,
+                  player1: prevMatch1.winner || null,
+                  player2: prevMatch2.winner || null,
+                  winner: null
                 });
+              }
+              allMatches.push(...roundMatches);
+            }
+            
+            setStudentIds(ids);
+            setParticipants(filled);
+            setMatches(allMatches);
+            setHistory([]);
+            setIsGenerated(true);
+          };
+
+          const selectWinner = (matchId, winner) => {
+            setHistory([...history, JSON.parse(JSON.stringify(matches))]);
+            
+            const newMatches = [...matches];
+            const matchIndex = newMatches.findIndex(m => m.matchId === matchId);
+            const match = newMatches[matchIndex];
+            
+            if (match.winner === winner) {
+              match.winner = null;
+            } else {
+              match.winner = winner;
+            }
+            
+            updateSubsequentRounds(newMatches, match.round);
+            setMatches(newMatches);
+          };
+
+          const updateSubsequentRounds = (allMatches, startRound) => {
+            const maxRound = Math.max(...allMatches.map(m => m.round));
+            
+            for (let r = startRound; r < maxRound; r++) {
+              const currentRoundMatches = allMatches.filter(m => m.round === r);
+              const nextRoundMatches = allMatches.filter(m => m.round === r + 1);
+              
+              currentRoundMatches.forEach((match, idx) => {
+                const nextMatchIndex = Math.floor(idx / 2);
+                const nextMatch = nextRoundMatches[nextMatchIndex];
+                
+                if (nextMatch) {
+                  if (idx % 2 === 0) {
+                    const newPlayer = match.winner || null;
+                    if (nextMatch.player1 !== newPlayer) {
+                      nextMatch.player1 = newPlayer;
+                      if (nextMatch.winner && nextMatch.winner !== nextMatch.player1 && nextMatch.winner !== nextMatch.player2) {
+                        nextMatch.winner = null;
+                      }
+                    }
+                  } else {
+                    const newPlayer = match.winner || null;
+                    if (nextMatch.player2 !== newPlayer) {
+                      nextMatch.player2 = newPlayer;
+                      if (nextMatch.winner && nextMatch.winner !== nextMatch.player1 && nextMatch.winner !== nextMatch.player2) {
+                        nextMatch.winner = null;
+                      }
+                    }
+                  }
+                  
+                  if (nextMatch.winner) {
+                    if (nextMatch.winner !== nextMatch.player1 && nextMatch.winner !== nextMatch.player2) {
+                      nextMatch.winner = null;
+                    }
+                  }
+                  
+                  if (nextMatch.player1 && !nextMatch.player2) {
+                    nextMatch.winner = nextMatch.player1;
+                  } else if (nextMatch.player2 && !nextMatch.player1) {
+                    nextMatch.winner = nextMatch.player2;
+                  } else if (!nextMatch.player1 && !nextMatch.player2) {
+                    nextMatch.winner = null;
+                  }
+                }
+              });
+            }
+          };
+
+          const undo = () => {
+            if (history.length > 0) {
+              const previousState = history[history.length - 1];
+              setMatches(previousState);
+              setHistory(history.slice(0, -1));
+            }
+          };
+
+          const reset = () => {
+            setParticipants([]);
+            setMatches([]);
+            setHistory([]);
+            setIsGenerated(false);
+            setStudentIds([]);
+          };
+
+          // 匯出 CSV 功能
+          const exportToCSV = () => {
+            if (matches.length === 0) {
+              alert('目前沒有比賽記錄可以匯出！');
+              return;
             }
 
-            rounds.push(nextRound);
-            currentRound++;
-            renderBracket();
-        }
-
-        function resetBracket() {
-            if (confirm('確定要重置所有比賽記錄嗎？')) {
-                document.getElementById('bracket').innerHTML = '';
-                players = [];
-                rounds = [];
-                matchHistory = [];
-                currentRound = 0;
-            }
-        }
-
-        // 匯出 CSV 功能
-        function exportToCSV() {
-            if (matchHistory.length === 0) {
-                alert('目前沒有比賽記錄可以匯出！');
-                return;
-            }
-
-            // 建立 CSV 內容
             let csvContent = '\uFEFF'; // UTF-8 BOM for Excel
             csvContent += '回合,選手1,選手2,獲勝者\n';
 
-            matchHistory.forEach(match => {
-                csvContent += `${match.round},${match.player1},${match.player2},${match.winner}\n`;
+            matches.forEach(match => {
+              if (match.player1 || match.player2) {
+                const roundName = match.round === Math.max(...matches.map(m => m.round)) ? '決賽' : `第${match.round + 1}輪`;
+                const player1 = match.player1 || '待定';
+                const player2 = match.player2 || '待定';
+                const winner = match.winner || '未決定';
+                
+                csvContent += `${roundName},${player1},${player2},${winner}\n`;
+              }
             });
 
             // 加入最終冠軍
-            if (rounds.length > 0 && rounds[rounds.length - 1][0].winner) {
-                const champion = rounds[rounds.length - 1][0].winner;
-                csvContent += `\n最終冠軍,,,${champion.name}\n`;
+            const finalMatch = matches.find(m => m.round === Math.max(...matches.map(m => m.round)));
+            if (finalMatch && finalMatch.winner) {
+              csvContent += `\n最終冠軍,,,${finalMatch.winner}\n`;
             }
 
-            // 建立下載連結
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
@@ -560,39 +268,370 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-        }
+          };
 
-        // 匯出 PNG 功能
-        function exportToPNG() {
-            const bracketContainer = document.getElementById('bracketContainer');
-            
-            // 使用 html2canvas 將對戰表轉換為圖片
-            html2canvas(bracketContainer, {
-                backgroundColor: '#f8f9fa',
-                scale: 2, // 提高解析度
+          // 匯出 PNG 功能 (修正版)
+          const exportToPNG = async () => {
+            if (!bracketRef.current) {
+              alert('無法匯出圖片！');
+              return;
+            }
+
+            if (typeof html2canvas === 'undefined') {
+              alert('圖片匯出功能載入失敗，請重新整理頁面後再試！');
+              return;
+            }
+
+            setIsExporting(true);
+
+            try {
+              const canvas = await html2canvas(bracketRef.current, {
+                backgroundColor: '#ffffff',
+                scale: 2,
                 logging: false,
-                useCORS: true
-            }).then(canvas => {
-                // 轉換為 PNG 並下載
-                canvas.toBlob(blob => {
-                    const link = document.createElement('a');
-                    const url = URL.createObjectURL(blob);
-                    
-                    link.setAttribute('href', url);
-                    link.setAttribute('download', `比賽對戰表_${new Date().toLocaleDateString()}.png`);
-                    link.style.visibility = 'hidden';
-                    
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                });
+                useCORS: true,
+                allowTaint: true,
+                scrollY: -window.scrollY,
+                scrollX: -window.scrollX,
+                windowWidth: document.documentElement.scrollWidth,
+                windowHeight: document.documentElement.scrollHeight
+              });
+
+              canvas.toBlob((blob) => {
+                if (blob) {
+                  const link = document.createElement('a');
+                  const url = URL.createObjectURL(blob);
+                  
+                  link.href = url;
+                  link.download = `比賽對戰表_${new Date().toLocaleDateString().replace(/\//g, '-')}.png`;
+                  
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                  
+                  URL.revokeObjectURL(url);
+                  setIsExporting(false);
+                } else {
+                  alert('圖片產生失敗，請再試一次！');
+                  setIsExporting(false);
+                }
+              }, 'image/png');
+            } catch (error) {
+              console.error('PNG export error:', error);
+              alert('圖片匯出失敗：' + error.message);
+              setIsExporting(false);
+            }
+          };
+
+          const matchesByRound = useMemo(() => {
+            const rounds = {};
+            matches.forEach(match => {
+              if (!rounds[match.round]) {
+                rounds[match.round] = [];
+              }
+              rounds[match.round].push(match);
             });
+            return rounds;
+          }, [matches]);
+
+          const totalRounds = Object.keys(matchesByRound).length;
+
+          return (
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+              <div className="max-w-7xl mx-auto">
+                <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+                  <div className="flex items-center gap-3 mb-6">
+                    <Trophy className="w-8 h-8 text-yellow-500" />
+                    <h1 className="text-3xl font-bold text-gray-800">比賽晉級系統</h1>
+                  </div>
+                  
+                  <div className="flex flex-wrap items-center gap-4 mb-4">
+                    <div className="flex items-center gap-2">
+                      <Users className="w-5 h-5 text-gray-600" />
+                      <label className="font-medium text-gray-700">參賽人數:</label>
+                      <input
+                        type="number"
+                        min="2"
+                        max="40"
+                        value={numParticipants}
+                        onChange={(e) => {
+                          const newNum = Math.min(40, Math.max(2, parseInt(e.target.value) || 2));
+                          setNumParticipants(newNum);
+                          setStudentIds([]);
+                        }}
+                        className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        disabled={isGenerated}
+                      />
+                    </div>
+                    
+                    {!isGenerated && (
+                      <button
+                        onClick={startEditingIds}
+                        className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                        {studentIds.length > 0 ? '編輯學號' : '輸入學號'}
+                      </button>
+                    )}
+                    
+                    <button
+                      onClick={generateBracket}
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400"
+                      disabled={isGenerated}
+                    >
+                      <RefreshCw className="w-4 h-4" />
+                      {isGenerated ? '已配對' : '隨機配對'}
+                    </button>
+                    
+                    {isGenerated && (
+                      <>
+                        <button
+                          onClick={generateBracket}
+                          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                        >
+                          <RefreshCw className="w-4 h-4" />
+                          重新配對
+                        </button>
+                        
+                        <button
+                          onClick={undo}
+                          disabled={history.length === 0}
+                          className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors disabled:bg-gray-400"
+                        >
+                          <Undo className="w-4 h-4" />
+                          Undo ({history.length})
+                        </button>
+                        
+                        <button
+                          onClick={reset}
+                          className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                        >
+                          <RefreshCw className="w-4 h-4" />
+                          重設比賽
+                        </button>
+
+                        <div className="flex gap-2 border-l-2 border-gray-300 pl-4">
+                          <button
+                            onClick={exportToCSV}
+                            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+                          >
+                            <FileSpreadsheet className="w-4 h-4" />
+                            匯出 CSV
+                          </button>
+                          
+                          <button
+                            onClick={exportToPNG}
+                            disabled={isExporting}
+                            className="flex items-center gap-2 px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                          >
+                            {isExporting ? (
+                              <>
+                                <RefreshCw className="w-4 h-4 animate-spin" />
+                                處理中...
+                              </>
+                            ) : (
+                              <>
+                                <Image className="w-4 h-4" />
+                                匯出 PNG
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  {!isGenerated && studentIds.length > 0 && (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                      <div className="flex items-center gap-2 text-green-700">
+                        <Check className="w-5 h-5" />
+                        <span className="font-medium">已設定 {studentIds.length} 個學號</span>
+                      </div>
+                      <div className="text-sm text-green-600 mt-1">
+                        學號: {studentIds.join(', ')}
+                      </div>
+                    </div>
+                  )}
+
+                  {isEditingIds && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-screen overflow-y-auto">
+                        <div className="p-6">
+                          <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-2xl font-bold text-gray-800">輸入學號</h2>
+                            <button
+                              onClick={cancelEditIds}
+                              className="text-gray-400 hover:text-gray-600"
+                            >
+                              <X className="w-6 h-6" />
+                            </button>
+                          </div>
+                          
+                          <div className="mb-4">
+                            <p className="text-gray-600 mb-2">
+                              請輸入 <span className="font-bold text-blue-600">{numParticipants}</span> 個學號，每行一個：
+                            </p>
+                            <p className="text-sm text-gray-500 mb-4">
+                              💡 提示：如不輸入，將自動使用 1 到 {numParticipants} 作為學號
+                            </p>
+                            <textarea
+                              value={tempIds}
+                              onChange={(e) => setTempIds(e.target.value)}
+                              placeholder="例如：\n20240001\n20240002\n20240003\n..."
+                              className="w-full h-96 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
+                              spellCheck={false}
+                            />
+                            <div className="text-sm text-gray-500 mt-2">
+                              目前行數: {tempIds.split('\n').filter(id => id.trim() !== '').length} / {numParticipants}
+                            </div>
+                          </div>
+                          
+                          <div className="flex gap-3">
+                            <button
+                              onClick={confirmEditIds}
+                              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                            >
+                              <Check className="w-5 h-5" />
+                              確認
+                            </button>
+                            <button
+                              onClick={cancelEditIds}
+                              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+                            >
+                              <X className="w-5 h-5" />
+                              取消
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {isGenerated && (
+                  <div className="bg-white rounded-lg shadow-lg p-6">
+                    <div ref={bracketRef} className="w-full">
+                      <div className="text-sm text-gray-600 mb-4 text-center">
+                        💡 提示：點擊選手可選擇勝者，再次點擊已選中的勝者可取消選擇
+                      </div>
+                      <div className="flex justify-center">
+                        <div className="inline-flex flex-col gap-8">
+                          {Object.keys(matchesByRound).map((roundNum) => {
+                            const round = parseInt(roundNum);
+                            const roundMatches = matchesByRound[round];
+                            const isFinal = round === totalRounds - 1;
+                            
+                            return (
+                              <div key={round} className="flex flex-col">
+                                <h3 className="text-lg font-bold text-gray-700 mb-4 text-center">
+                                  {isFinal ? '🏆 決賽' : `第 ${round + 1} 輪`}
+                                  <span className="text-sm text-gray-500 ml-2">
+                                    ({roundMatches.length} {isFinal ? '場' : '組'})
+                                  </span>
+                                </h3>
+                                
+                                <div className="flex gap-6 justify-center flex-wrap">
+                                  {roundMatches.map((match) => {
+                                    const canSelect = match.player1 && match.player2;
+                                    const isBye = (match.player1 && !match.player2) || (match.player2 && !match.player1);
+                                    
+                                    return (
+                                      <div key={match.matchId} className="flex flex-col items-center">
+                                        <div className={`bg-gray-50 border-2 rounded-lg p-4 w-48 ${
+                                          isBye ? 'border-yellow-300 bg-yellow-50' : 'border-gray-200'
+                                        }`}>
+                                          {isBye && (
+                                            <div className="text-center text-xs text-yellow-600 font-bold mb-2">
+                                              輪空直接晉級
+                                            </div>
+                                          )}
+                                          
+                                          <div
+                                            onClick={() => {
+                                              if (canSelect) {
+                                                selectWinner(match.matchId, match.player1);
+                                              }
+                                            }}
+                                            className={`p-3 rounded-lg mb-2 text-center font-bold transition-all ${
+                                              match.winner === match.player1
+                                                ? 'bg-green-500 text-white shadow-lg scale-105 cursor-pointer'
+                                                : match.player1
+                                                ? canSelect 
+                                                  ? 'bg-blue-100 hover:bg-blue-200 text-blue-800 cursor-pointer' 
+                                                  : 'bg-blue-100 text-blue-800'
+                                                : 'bg-gray-200 text-gray-400'
+                                            }`}
+                                          >
+                                            {match.player1 ? `${match.player1}` : '待定'}
+                                            {match.winner === match.player1 && ' ✓'}
+                                          </div>
+                                          
+                                          <div className="text-center text-gray-400 text-sm my-1">VS</div>
+                                          
+                                          <div
+                                            onClick={() => {
+                                              if (canSelect) {
+                                                selectWinner(match.matchId, match.player2);
+                                              }
+                                            }}
+                                            className={`p-3 rounded-lg text-center font-bold transition-all ${
+                                              match.winner === match.player2
+                                                ? 'bg-green-500 text-white shadow-lg scale-105 cursor-pointer'
+                                                : match.player2
+                                                ? canSelect 
+                                                  ? 'bg-blue-100 hover:bg-blue-200 text-blue-800 cursor-pointer' 
+                                                  : 'bg-blue-100 text-blue-800'
+                                                : 'bg-gray-200 text-gray-400'
+                                            }`}
+                                          >
+                                            {match.player2 ? `${match.player2}` : '待定'}
+                                            {match.winner === match.player2 && ' ✓'}
+                                          </div>
+                                        </div>
+                                        
+                                        {match.winner && !isFinal && (
+                                          <div className="mt-2 text-center">
+                                            <div className="text-2xl">↓</div>
+                                            <div className="text-sm font-bold text-green-600">
+                                              {match.winner}
+                                            </div>
+                                          </div>
+                                        )}
+                                        
+                                        {match.winner && isFinal && (
+                                          <div className="mt-4 text-center">
+                                            <Trophy className="w-12 h-12 text-yellow-500 mx-auto mb-2" />
+                                            <div className="text-xl font-bold text-yellow-600">
+                                              冠軍：{match.winner}
+                                            </div>
+                                          </div>
+                                        )}
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {!isGenerated && (
+                  <div className="bg-white rounded-lg shadow-lg p-6 text-center text-gray-500">
+                    <Users className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                    <p className="text-lg mb-2">請設定參賽人數並點擊「隨機配對」開始比賽</p>
+                    <p className="text-sm text-gray-400">可選擇性輸入學號，或使用預設的 1 到 N 編號</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
         }
 
-        // 頁面載入時生成預設對戰表
-        window.onload = function() {
-            generateBracket();
-        };
+        ReactDOM.render(<TournamentBracket />, document.getElementById('root'));
     </script>
 </body>
 </html>
