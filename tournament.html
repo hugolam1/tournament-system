@@ -39,6 +39,7 @@
 
         function TournamentBracket() {
           const [numParticipants, setNumParticipants] = useState(8);
+          const [numParticipantsInput, setNumParticipantsInput] = useState('8');
           const [studentIds, setStudentIds] = useState([]);
           const [participants, setParticipants] = useState([]);
           const [matches, setMatches] = useState([]);
@@ -55,6 +56,35 @@
 
           const calculateRounds = (num) => {
             return Math.ceil(Math.log2(num));
+          };
+
+          const handleNumParticipantsChange = (e) => {
+            const value = e.target.value;
+            setNumParticipantsInput(value);
+            
+            // 如果輸入為空或只有空格，不做處理
+            if (value.trim() === '') {
+              return;
+            }
+            
+            // 轉換為數字並限制範圍
+            const num = parseInt(value);
+            if (!isNaN(num)) {
+              const clampedNum = Math.min(40, Math.max(2, num));
+              setNumParticipants(clampedNum);
+              setStudentIds([]);
+            }
+          };
+
+          const handleNumParticipantsBlur = () => {
+            // 當失去焦點時，如果輸入為空，設定為預設值 2
+            if (numParticipantsInput.trim() === '') {
+              setNumParticipants(2);
+              setNumParticipantsInput('2');
+            } else {
+              // 同步顯示值為實際值
+              setNumParticipantsInput(numParticipants.toString());
+            }
           };
 
           const startEditingIds = () => {
@@ -237,7 +267,7 @@
               return;
             }
 
-            let csvContent = '\uFEFF'; // UTF-8 BOM for Excel
+            let csvContent = '\uFEFF';
             csvContent += '回合,選手1,選手2,獲勝者\n';
 
             matches.forEach(match => {
@@ -251,7 +281,6 @@
               }
             });
 
-            // 加入最終冠軍
             const finalMatch = matches.find(m => m.round === Math.max(...matches.map(m => m.round)));
             if (finalMatch && finalMatch.winner) {
               csvContent += `\n最終冠軍,,,${finalMatch.winner}\n`;
@@ -270,7 +299,7 @@
             document.body.removeChild(link);
           };
 
-          // 匯出 PNG 功能 (修正版)
+          // 匯出 PNG 功能
           const exportToPNG = async () => {
             if (!bracketRef.current) {
               alert('無法匯出圖片！');
@@ -323,13 +352,17 @@
             }
           };
 
+          // 過濾出有效的對戰組合（至少有一個選手）
           const matchesByRound = useMemo(() => {
             const rounds = {};
             matches.forEach(match => {
-              if (!rounds[match.round]) {
-                rounds[match.round] = [];
+              // 只顯示至少有一個選手的對戰
+              if (match.player1 || match.player2) {
+                if (!rounds[match.round]) {
+                  rounds[match.round] = [];
+                }
+                rounds[match.round].push(match);
               }
-              rounds[match.round].push(match);
             });
             return rounds;
           }, [matches]);
@@ -350,18 +383,15 @@
                       <Users className="w-5 h-5 text-gray-600" />
                       <label className="font-medium text-gray-700">參賽人數:</label>
                       <input
-                        type="number"
-                        min="2"
-                        max="40"
-                        value={numParticipants}
-                        onChange={(e) => {
-                          const newNum = Math.min(40, Math.max(2, parseInt(e.target.value) || 2));
-                          setNumParticipants(newNum);
-                          setStudentIds([]);
-                        }}
+                        type="text"
+                        value={numParticipantsInput}
+                        onChange={handleNumParticipantsChange}
+                        onBlur={handleNumParticipantsBlur}
                         className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         disabled={isGenerated}
+                        placeholder="2-40"
                       />
+                      <span className="text-sm text-gray-500">(2-40人)</span>
                     </div>
                     
                     {!isGenerated && (
